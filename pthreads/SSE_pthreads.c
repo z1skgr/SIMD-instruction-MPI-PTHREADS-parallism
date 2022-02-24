@@ -1,8 +1,8 @@
 /*
             ======================================================
             + Name        : SSE_pthreads.c                       +
-            + Author      : Christos Z, 			             +
-            + Description : SSE extension pthreads 			     +
+            + Author      : Christos Z, 		     +
+            + Description : SSE extension pthreads 	     +
             ======================================================
  */
 
