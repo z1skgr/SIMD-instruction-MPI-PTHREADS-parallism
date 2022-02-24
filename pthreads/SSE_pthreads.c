@@ -51,15 +51,6 @@ float randpval (void)
 
 typedef struct
 {
-    //Thread Data
-    int threadID;
-    int threadTOTAL;
-    int threadBARRIER;
-    int threadOPERATION;
-
-    //Where the loop begins and ends
-    int threadSTART;
-    int threadEND;
 
     //All the data
     __m128 * mVec;
