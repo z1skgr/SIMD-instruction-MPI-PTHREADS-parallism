@@ -13,9 +13,16 @@
 
 
 ## General Information
+Streaming SIMD Extensions (SSE), MPI and Pthreads 
+for parallelization the calculation of a simplified form of OMEGA
+statistical, to detect positive selection in DNA sequences.
 
+Repeated for a set of N DNA sites, extract statistical OMEGA outputs
 
 ## Features
+* Reference
+* SSE instruction application
+* Parallel standards (pthreads/MPI) + SSE
 
 
 Benchmarked on Intel(R) Core(TM) i7-1065G7 @ 1.30GHz 1.50 GHz with 8GB DDR3 memory.
@@ -34,11 +41,14 @@ $ sudo apt install gcc
 ```
 ### Reference
 
-
-
-### OpenMP
+1. Compile .c file
+```
+gcc -o newserial newserial.c
+```
 
 ### Pthreads
+
+### MPI
 
 
 
