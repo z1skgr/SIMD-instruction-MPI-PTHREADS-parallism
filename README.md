@@ -43,7 +43,7 @@ $ sudo apt install gcc
 
 1. Compile .c file
 ```
-gcc -o newserial newserial.c
+gcc -o reference reference.c
 ```
 
 ### Pthreads
