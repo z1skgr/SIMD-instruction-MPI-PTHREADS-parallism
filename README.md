@@ -13,22 +13,26 @@
 
 
 ## General Information
-Streaming SIMD Extensions (SSE), MPI and Pthreads 
+__Streaming SIMD Extensions (SSE), MPI and Pthreads__
 for parallelization the calculation of a simplified form of OMEGA
 statistical, to detect positive selection in DNA sequences.
 
-Repeated for a set of N DNA sites, extract statistical OMEGA outputs
+Repeated for a set of _N DNA_ sites, extract statistical OMEGA outputs
+
+_BONUS:_ Implementation of a different memory layout for better 
+performance with _SSE_ commands. 
 
 ## Features
 * Reference
-* SSE instruction application
+* SSE instructions 
 * Parallel standards (pthreads/MPI) + SSE
 
 
 Benchmarked on Intel(R) Core(TM) i7-1065G7 @ 1.30GHz 1.50 GHz with 8GB DDR3 memory.
 
 ## Prerequisites 
-
+[SIMD](https://software.intel.com/sites/landingpage/IntrinsicsGuide) <br>
+[MPI](http://mpitutorial.com/tutorials/)
 
 
 
@@ -38,21 +42,48 @@ Benchmarked on Intel(R) Core(TM) i7-1065G7 @ 1.30GHz 1.50 GHz with 8GB DDR3 memo
 ```
 $ gcc --version
 $ sudo apt install gcc
+
 ```
+
+
 ### Reference
 
-1. Compile .c file
 ```
 gcc -o reference reference.c
+./reference 'N'
+```
+
+### SSE
+```
+gcc -o jam jam.c
+./jam 'N'
+gcc -o unroll unroll.c
+./unroll 'N'
+```
+Add -msse4.2 library
+```
+gcc -o SSE SSE.c -msse4.2
+./SSE 'N'
 ```
 
 ### Pthreads
-
+```
+gcc -pthread SSE_pthreads.c -o SSE_pthreads -msse4.2
+./SSE_pthreads 'N' 'N_threads'
+```
 ### MPI
+```
+mpicc -pthread SSE_Mpthreads.c -o SSE_Mpthreads -msse4.2 -lm
+lamboot -v host
+mpiexec -n 'N_proc' ./SSE_Mpthreads 'N' 'N_threads'
+```
 
-
-
-# Setup
+### Bonus 
+```
+gcc -o bonus bonus.c -msse4.2
+./bonus 'N'
+```
+## Setup
 Script  variables initialized as:
 * N = 10000000. 
 * Threads = [2 4]
