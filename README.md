@@ -44,7 +44,7 @@ $ gcc --version
 $ sudo apt install gcc
 
 ```
-
+Supposing you can navigate the proper folder to compile the desired source code from the terminal
 
 ### Reference
 
