@@ -1,5 +1,5 @@
 # SIMD-instructions/parallism
->   Parallelism standards for accelerating performance on calculations
+>   Parallelism standards for accelerating performance on calculations for detection of positive DNA selection
 
 
 
