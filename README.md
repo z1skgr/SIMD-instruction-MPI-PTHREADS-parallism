@@ -19,6 +19,21 @@ statistical, to detect positive selection in DNA sequences.
 
 Repeated for a set of _N DNA_ sites, extract statistical OMEGA outputs
 
+| $$num = \frac{L+R}{\left(\frac{m*(m-1.0)}{2.0}\right) + \left(\frac{n*(n-1.0)}{2.0}\right)}$$ |
+|---|
+| $$den= \frac{C-L-R}{m*n}$$  |
+| $$\omega= \frac{num}{den+0.01}$$  |
+
+The above calculations are repeated iteratively for a set of N DNA sites, 
+$N$ is a variable for which $N ≥ 1$ . All input data
+is arranged in arrays of length N (user variable).
+
+Interested for 
+| $$max_{\omega}$$   | $$min_{\omega}$$  | $$avg_{\omega}$$  |
+|---|---|---|
+
+
+
 _BONUS:_ Implementation of a different memory layout for better 
 performance with _SSE_ commands. 
 
@@ -27,7 +42,7 @@ performance with _SSE_ commands.
 * SSE instructions 
 * Parallel standards (pthreads/MPI) + SSE
 
-
+The implementation was guided by the reference file
 Benchmarked on Intel(R) Core(TM) i7-1065G7 @ 1.30GHz 1.50 GHz with 8GB DDR3 memory.
 
 ## Prerequisites 
