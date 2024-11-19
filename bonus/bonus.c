@@ -14,18 +14,20 @@
 #include <xmmintrin.h>
 #include <pmmintrin.h>
 
-#define MINSNPS_B 5
-#define MAXSNPS_E 20
+#define MINSNPS_B 5 // Minimum SNP value
+#define MAXSNPS_E 20 // Maximum SNP value
 
 double gettime(void);
 float randpval (void);
 
+// Function to get the current time
 double gettime(void){
     struct timeval ttime;
     gettimeofday(&ttime , NULL);
     return ttime.tv_sec + ttime.tv_usec * 0.000001;
 }
 
+// Function to generate a random p float value between 0 and 1
 float randpval (void){
     int vr = rand();
     int vm = rand()%vr;
@@ -36,21 +38,22 @@ float randpval (void){
 
 int main(int argc,char** argv){
 
-    assert(argc==2);
-    double timeTotalMainStart = gettime();
+    assert(argc==2); // Ensure the correct number of arguments is provided
+    double timeTotalMainStart = gettime(); // Start timing the main function
 
-    unsigned int N = (unsigned int)atoi(argv[1]);
-    unsigned int iters = 10;
+    unsigned int N = (unsigned int)atoi(argv[1]); // Convert to integer
+    unsigned int iters = 10;  // Iterations
 
     unsigned int leftovers=N%4;
 
     srand(1);
 
+    //Statistics, maxf with high value, ensure to get max value, minf with low value,
     float avgF = 0.0f;
     float maxF = FLT_MIN;
     float minF = FLT_MAX;
 
-
+    // Allocate memory for max, min, and average vectors with 32-byte alignment
     float * maxVec = (float*)_mm_malloc(sizeof(float),32);
     assert(maxVec!=NULL);
     float * minVec = (float*)_mm_malloc(sizeof(float),32);
@@ -58,7 +61,7 @@ int main(int argc,char** argv){
     float * avgVec = (float*)_mm_malloc(sizeof(float),32);
     assert(avgVec!=NULL);
 
-
+    // Allocate 4 splits on a 128 byte alignment with 32byte
     for(int i=0;i<4;i++){
         maxVec[i]=FLT_MIN;
         minVec[i]=FLT_MAX;
@@ -89,6 +92,8 @@ int main(int argc,char** argv){
     double timeOmegaTotalStart = gettime();
 	
     for(unsigned int i=0;i<(N*6);i+=24){
+        //Calculation for each of 4 segment of 128byte alignment
+
         allVec[i] = (float)(MINSNPS_B+rand()%MAXSNPS_E);
         allVec[i+4] = (float)(MINSNPS_B+rand()%MAXSNPS_E);
         allVec[i+8] = randpval()*allVec[i]*allVec[i+4];
@@ -123,14 +128,14 @@ int main(int argc,char** argv){
     //Vectors with constants.;
 
     //Vector all data
-    __m128 * allFVec128 = (__m128 *) allVec;
+    __m128 * allFVec128 = (__m128 *) allVec; // Cast allVec to __m128 for SIMD operations
 
     //	Vectors for max,min,avg.
-	__m128 maxFVec128 = _mm_set_ps1(FLT_MIN);
-	__m128 minFVec128 = _mm_set_ps1(FLT_MAX);
-	__m128 avgFVec128 = _mm_set_ps1(0);
+	__m128 maxFVec128 = _mm_set_ps1(FLT_MIN); // Initialize max vector m128 intel Intrinsics 
+	__m128 minFVec128 = _mm_set_ps1(FLT_MAX); // Initialize max vector m128 intel Intrinsics 
+	__m128 avgFVec128 = _mm_set_ps1(0); // Initialize max vector m128 intel Intrinsics 
 
-
+    // Temporary vectors for calculations
     __m128 num_0;
     __m128 num_1;
     __m128 num_2;
@@ -139,20 +144,19 @@ int main(int argc,char** argv){
     __m128 den_1;
     __m128 den;
     
-        __m128 vec1 = _mm_set1_ps(1.0f);
+       
+    __m128 vec1 = _mm_set1_ps(1.0f);
     __m128 vec2 = _mm_set1_ps(2.0f);
     __m128 vec3 = _mm_set_ps1(0.01f);
 
 	__m128 comparemaxFlags;
 	__m128 compareminFlags;
 
-
-
 	for(unsigned int j=0;j<iters;j++){
 		avgF = 0.0f;
 		maxF = 0.0f;
 		minF = FLT_MAX;
-		
+		//Calculation on 128 byte layout. Check allVec line 96
 		for(unsigned int i=0;i<(N*6)/4;i+=6){
 			num_0 = _mm_add_ps(allFVec128[i+3], allFVec128[i+4]);
 			
@@ -192,7 +196,7 @@ int main(int argc,char** argv){
 
    		avgF = avgVec[0] + avgVec[1] + avgVec[2] + avgVec[3]; 	*/
 
-			//	Horizontal max.
+		//	Horizontal max.
 		__m128 tempMax = _mm_max_ps(maxFVec128, _mm_shuffle_ps(maxFVec128, maxFVec128, _MM_SHUFFLE(0,0,3,2)));
 		maxF = _mm_cvtss_f32(_mm_max_ps(tempMax, _mm_shuffle_ps(tempMax, tempMax, _MM_SHUFFLE(0,0,0,1))));
 		__m128 tempMin = _mm_min_ps(minFVec128, _mm_shuffle_ps(minFVec128, minFVec128, _MM_SHUFFLE(0,0,3,2)));
@@ -201,7 +205,7 @@ int main(int argc,char** argv){
 		avgF = _mm_cvtss_f32(_mm_add_ps(tempAvg, _mm_shuffle_ps(tempAvg, tempAvg, _MM_SHUFFLE(0,0,0,1))));
 
 
-			  //Leftovers;
+	    //Process leftovers
 	   	for(unsigned int i=N-leftovers;i<N;i+=6)
 		{
 				float num_0 = allVec[i+3]+allVec[i+4];

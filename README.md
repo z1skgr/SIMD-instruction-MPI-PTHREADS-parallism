@@ -53,13 +53,39 @@ Benchmarked on Intel(R) Core(TM) i7-1065G7 @ 1.30GHz 1.50 GHz with 8GB DDR3 memo
 
 ## How to run
 
-1. GCC installation
+1. GCC Installation
 ```
 $ gcc --version
 $ sudo apt install gcc
+$ sudo apt install lam-runtime
 
 ```
 Supposing you can navigate the proper folder to compile the desired source code from the terminal
+
+2. MPI Installation
+Download the source code [MPI](https://www.mpich.org/downloads/) release
+```
+$ tar -xzf mpich-X-X-X.tar.gz
+$ cd mpich-X-X-X
+
+```
+where `X-X-X` mpi version
+
+```
+$ ./configure
+$ make; sudo make install
+```
+
+3. Check MPI version
+
+```
+$ mpiexec --version
+```
+
+4. LAM installation
+```
+sudo apt-get install lam-runtime
+```
 
 ### Reference
 

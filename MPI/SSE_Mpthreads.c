@@ -16,8 +16,8 @@
 #include "xmmintrin.h"
 #include <mpi.h>
 
-#define MINSNPS_B 5
-#define MAXSNPS_E 20
+#define MINSNPS_B 5 // Minimum value for SNPs
+#define MAXSNPS_E 20 // Maximum value for SNPs
 
 #define BUSYWAIT 0
 #define EXECUTE 1
@@ -32,7 +32,7 @@ float randpval (void);
 static pthread_t * workerThread;
 static pthread_barrier_t barrier;
 
-
+// Macros for maximum and minimum calculations
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define MAX4(a,b,c,d) MAX(0, MAX(a,MAX(b,MAX(c,d))))
 
@@ -40,6 +40,7 @@ static pthread_barrier_t barrier;
 #define MIN4(a,b,c,d) MIN(0, MIN(a,MIN(b,MIN(c,d))))
 
 
+// Function to get the current time
 double gettime(void)
 {
     struct timeval ttime;
@@ -47,6 +48,7 @@ double gettime(void)
     return ttime.tv_sec + ttime.tv_usec * 0.000001;
 }
 
+// Function to generate a random float value between 0 and 1
 float randpval (void)
 {
     int vr = rand();
@@ -120,15 +122,17 @@ typedef struct
 
 void initializeThreadData(threadData_t * threadData, int i, int threads,int n,float * mVec1,float * nVec1,float * LVec1,float * RVec1,float* CVec1,float* FVec1)
 {
-    threadData->threadID=i;
-    threadData->threadTOTAL=threads;
-    threadData->threadBARRIER=0;
-    threadData->threadOPERATION=BUSYWAIT;
+    threadData->threadID=i; //id
+    threadData->threadTOTAL=threads; //t_threads
+    threadData->threadBARRIER=0; //Barrier synchro
+    threadData->threadOPERATION=BUSYWAIT; //State
 
     ///We find the limits of loop
 
     threadData->threadSTART=(n/threads)*i;
     threadData->threadEND =(n/threads)*(i+1);
+
+    //Data vectors
 
     threadData->dt.mVec= (__m128 *) mVec1;
     threadData->dt.nVec= (__m128 *) nVec1;
@@ -137,11 +141,12 @@ void initializeThreadData(threadData_t * threadData, int i, int threads,int n,fl
     threadData->dt.CVec= (__m128 *) CVec1;
     threadData->dt.FVec= (__m128 *) FVec1;
 
+    //Memory allocation
     threadData->dt.maxval = (float*)_mm_malloc(sizeof(float),32);
     threadData->dt.minval = (float*)_mm_malloc(sizeof(float),32);
     threadData->dt.average = (float*)_mm_malloc(sizeof(float),32);
 
-
+    //Results value for each segment
     for (int i = 0; i < 4; ++i)
     {
         threadData->dt.maxval[i]=0.0f;
@@ -149,6 +154,7 @@ void initializeThreadData(threadData_t * threadData, int i, int threads,int n,fl
         threadData->dt.average[i]=0.0f;
     }
 
+    // Assign SIMD vectors for results
     threadData->dt.avgF= (__m128 *) threadData->dt.average;
     threadData->dt.maxF= (__m128 *) threadData->dt.maxval;
     threadData->dt.minF= (__m128 *) threadData->dt.minval;
@@ -158,7 +164,7 @@ void initializeThreadData(threadData_t * threadData, int i, int threads,int n,fl
     threadData->thread_sum=0.0f;
 }
 
-
+// Function to update thread data
 void updateThread(threadData_t * threadData)
 {
     for (int unsigned i=0;i<(threadData->threadTOTAL);i++){
@@ -248,12 +254,14 @@ void compute(threadData_t * threadData)
 
 }
 
+// Function to synchronize threads using a barrier
 void syncThreadsBARRIER(threadData_t * threadData)
 {
     threadData[0].threadOPERATION=BUSYWAIT;
     pthread_barrier_wait(&barrier);
 }
 
+// Function to set the operation state for all threads
 void setThreadOperation(threadData_t * threadData, int operation)
 {
     int i, threads=threadData[0].threadTOTAL;
@@ -262,7 +270,7 @@ void setThreadOperation(threadData_t * threadData, int operation)
         threadData[i].threadOPERATION = operation;
 }
 
-
+// Function to start operations for threads
 void startThreadOperations(threadData_t * threadData, int operation)
 {
     setThreadOperation(threadData, operation);
@@ -274,6 +282,7 @@ void startThreadOperations(threadData_t * threadData, int operation)
     syncThreadsBARRIER(threadData);
 }
 
+// Function to terminate worker threads
 void terminateWorkerThreads(pthread_t * workerThreadL, threadData_t * threadData)
 {
     int i, threads=threadData[0].threadTOTAL;
@@ -285,7 +294,7 @@ void terminateWorkerThreads(pthread_t * workerThreadL, threadData_t * threadData
         pthread_join(workerThreadL[i-1],NULL);
 }
 
-
+// Thread function
 void * thread (void * x)
 {
     threadData_t * currentThread = (threadData_t *) x;
